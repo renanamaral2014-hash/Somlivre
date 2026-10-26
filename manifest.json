@@ -1,0 +1,10 @@
+{
+  "name": "SomLivre — Música",
+  "short_name": "SomLivre",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#090909",
+  "theme_color": "#101010",
+  "description": "Interface de música com vídeos públicos do YouTube incorporados.",
+  "icons": []
+}

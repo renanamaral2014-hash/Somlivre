@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101010">
+<meta name="description" content="SomLivre — interface de música com vídeos do YouTube incorporados.">
+<link rel="manifest" href="manifest.json">
+<title>SomLivre — Música</title>
+<style>
+:root{color-scheme:dark;--bg:#090909;--panel:#151515;--panel2:#202020;--muted:#aaa;--green:#1ed760;--line:#303030}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(160deg,#202820 0,#0a0a0a 360px);background-color:var(--bg);color:#fff;font:15px system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh;padding-bottom:120px}
+header{padding:24px 18px 14px;display:flex;align-items:center;gap:12px}.logo{width:42px;height:42px;border-radius:50%;background:var(--green);color:#071b0d;display:grid;place-items:center;font-size:22px;font-weight:900}.brand{font-size:22px;font-weight:850;letter-spacing:-.7px}.sub{color:#b7c2b8;font-size:12px;margin-top:2px}
+main{max-width:850px;margin:auto;padding:0 16px}.section-title{font-size:23px;font-weight:800;letter-spacing:-.6px;margin:20px 0 12px}
+.search{display:flex;gap:8px}.search input,.url-input{width:100%;background:#242424;border:1px solid #3a3a3a;border-radius:12px;padding:14px;color:#fff;font:inherit;min-width:0;outline:none}.search input:focus,.url-input:focus{border-color:var(--green)}button{border:0;border-radius:999px;padding:12px 16px;font:700 14px system-ui;cursor:pointer}.primary{background:var(--green);color:#06190b}.secondary{background:#292929;color:white;border:1px solid #444}.search button{flex-shrink:0}
+.note{margin:12px 0;padding:12px 14px;background:#202820;border:1px solid #354635;border-radius:12px;color:#d5e5d5;font-size:13px;line-height:1.45}
+.player-card{background:rgba(18,18,18,.94);border:1px solid #303030;border-radius:18px;padding:14px;margin-top:16px;box-shadow:0 15px 40px #0005}
+.player-wrap{aspect-ratio:16/9;width:100%;overflow:hidden;border-radius:12px;background:#050505;display:grid;place-items:center}.player-wrap iframe{width:100%;height:100%;border:0}.placeholder{padding:24px;text-align:center;color:#888}.placeholder .big{font-size:44px;margin-bottom:8px}
+.now{display:flex;align-items:center;gap:12px;margin:14px 2px}.cover{width:58px;height:58px;border-radius:10px;background:linear-gradient(135deg,#24442d,#111);display:grid;place-items:center;font-size:25px;flex-shrink:0}.track{min-width:0;flex:1}.track strong{display:block;overflow-wrap:anywhere}.track small{display:block;color:var(--muted);margin-top:4px}
+.controls{display:flex;align-items:center;justify-content:center;gap:18px;margin:8px 0}.controls button{background:transparent;color:white;font-size:22px;padding:7px 12px}.controls .play{background:var(--green);color:#06190b;width:54px;height:54px;font-size:23px}
+.add-row{display:flex;gap:8px;margin-top:14px}.add-row button{white-space:nowrap}
+.queue-head{display:flex;justify-content:space-between;align-items:center;margin:24px 2px 10px}.queue-head h2{font-size:20px;margin:0}.queue{display:flex;flex-direction:column;gap:8px}.item{display:flex;align-items:center;gap:12px;background:#171717;border-radius:12px;padding:10px}.item.active{background:#263329;border:1px solid #3d6545}.thumb{width:54px;height:54px;border-radius:7px;object-fit:cover;background:#282828}.item-info{flex:1;min-width:0}.item-info strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.item-info small{color:var(--muted)}.item button{padding:8px 10px;background:#292929;color:#fff}
+.empty{color:#888;text-align:center;padding:22px;background:#141414;border-radius:12px}
+footer{position:fixed;bottom:0;left:0;right:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:#111e;border-top:1px solid #333;backdrop-filter:blur(18px);font-size:12px;color:#aaa;text-align:center}
+a{color:#b6edc2} .smallprint{font-size:12px;color:#999;line-height:1.5;margin:16px 2px}
+@media(min-width:700px){main{padding:0 24px}.player-layout{display:grid;grid-template-columns:1.25fr .75fr;gap:16px;align-items:start}.player-card{margin-top:0}.section-title{margin-top:25px}}
+</style>
+</head>
+<body>
+<header><div class="logo">♫</div><div><div class="brand">somlivre</div><div class="sub">Sua música, sua fila.</div></div></header>
+<main>
+  <div class="section-title">O que você quer ouvir?</div>
+  <form class="search" id="searchForm">
+    <input id="query" placeholder="Buscar música ou artista no YouTube" autocomplete="off" aria-label="Buscar música ou artista">
+    <button class="primary" type="submit">Buscar</button>
+  </form>
+  <div class="note"><strong>Como funciona:</strong> a busca abre os resultados oficiais do YouTube. Para tocar aqui, cole o link de um vídeo e adicione à fila. A reprodução em segundo plano depende do YouTube e do iOS; este app não desbloqueia recursos do Premium.</div>
+  <div class="player-layout">
+    <section class="player-card">
+      <div class="player-wrap" id="playerWrap"><div class="placeholder"><div class="big">♫</div>Escolha um vídeo para começar</div></div>
+      <div class="now"><div class="cover">♫</div><div class="track"><strong id="nowTitle">Nenhuma música selecionada</strong><small id="nowSubtitle">Cole um link do YouTube abaixo</small></div></div>
+      <div class="controls">
+        <button id="prevBtn" aria-label="Anterior" title="Anterior">⏮</button>
+        <button class="play" id="playBtn" aria-label="Reproduzir ou pausar" title="Reproduzir/pausar">▶</button>
+        <button id="nextBtn" aria-label="Próxima" title="Próxima">⏭</button>
+      </div>
+      <div class="add-row">
+        <input class="url-input" id="videoUrl" placeholder="Cole link ou ID do vídeo" aria-label="Link ou ID do vídeo">
+        <button class="primary" id="addBtn">Adicionar</button>
+      </div>
+      <div id="message" class="smallprint" aria-live="polite">Dica: adicione vídeos públicos que permitam incorporação.</div>
+    </section>
+    <section>
+      <div class="queue-head"><h2>Fila de reprodução</h2><button class="secondary" id="clearBtn">Limpar</button></div>
+      <div id="queue" class="queue"><div class="empty">Sua fila está vazia.</div></div>
+    </section>
+  </div>
+  <div class="smallprint">O SomLivre não hospeda nem baixa músicas. Os vídeos são reproduzidos pelo player oficial incorporado do YouTube. Conteúdos com incorporação desativada podem não tocar.</div>
+</main>
+<footer>SomLivre · protótipo web · reprodução sujeita às regras do YouTube e do iOS</footer>
+<script>
+const $=id=>document.getElementById(id);
+let queue=[],current=-1,player=null,apiReady=false,playing=false;
+function videoId(raw){
+  const s=(raw||'').trim();
+  if(/^[\w-]{11}$/.test(s)) return s;
+  try{
+    const u=new URL(s);
+    if(u.hostname==='youtu.be'||u.hostname.endsWith('.youtu.be')) return u.pathname.split('/').filter(Boolean)[0]||null;
+    if(u.hostname.includes('youtube.com')){
+      if(u.pathname==='/watch') return u.searchParams.get('v');
+      const parts=u.pathname.split('/').filter(Boolean);
+      if(['embed','shorts','live'].includes(parts[0])) return parts[1]||null;
+    }
+  }catch(e){}
+  return null;
+}
+function say(t){$('message').textContent=t}
+function loadYouTubeAPI(){
+ if(window.YT&&window.YT.Player){apiReady=true;return}
+ const tag=document.createElement('script');tag.src='https://www.youtube.com/iframe_api';document.head.appendChild(tag);
+}
+window.onYouTubeIframeAPIReady=()=>{apiReady=true};
+function ensurePlayer(id){
+ $('playerWrap').innerHTML='<div id="ytPlayer" style="width:100%;height:100%"></div>';
+ if(player){try{player.destroy()}catch(e){}player=null}
+ player=new YT.Player('ytPlayer',{videoId:id,playerVars:{playsinline:1,rel:0,origin:location.origin},events:{
+   onReady:()=>{say('Player pronto. Use os controles oficiais se necessário.');},
+   onStateChange:e=>{playing=e.data===YT.PlayerState.PLAYING;$('playBtn').textContent=playing?'Ⅱ':'▶';},
+   onError:e=>say('Este vídeo não pode ser reproduzido aqui (código '+e.data+'). Tente outro vídeo público.')
+ }});
+}
+function renderQueue(){
+ const root=$('queue');root.innerHTML='';
+ if(!queue.length){root.innerHTML='<div class="empty">Sua fila está vazia.</div>';return}
+ queue.forEach((v,i)=>{
+   const el=document.createElement('div');el.className='item'+(i===current?' active':'');
+   const img=document.createElement('img');img.className='thumb';img.alt='';img.src='https://i.ytimg.com/vi/'+v.id+'/mqdefault.jpg';
+   const info=document.createElement('div');info.className='item-info';
+   const title=document.createElement('strong');title.textContent=v.title||('Vídeo '+v.id);
+   const small=document.createElement('small');small.textContent='YouTube · vídeo incorporado';
+   info.append(title,small);
+   const play=document.createElement('button');play.textContent='▶';play.setAttribute('aria-label','Tocar '+(v.title||v.id));play.onclick=()=>playIndex(i);
+   const remove=document.createElement('button');remove.textContent='×';remove.setAttribute('aria-label','Remover da fila');remove.onclick=()=>{queue.splice(i,1);if(current===i){current=-1;$('nowTitle').textContent='Nenhuma música selecionada';$('nowSubtitle').textContent='Cole um link do YouTube abaixo'}else if(current>i)current--;renderQueue()};
+   el.append(img,info,play,remove);root.append(el);
+ });
+}
+function addVideo(raw){
+ const id=videoId(raw);if(!id){say('Link não reconhecido. Cole um link padrão do YouTube ou um ID de 11 caracteres.');return}
+ if(queue.some(v=>v.id===id)){say('Esse vídeo já está na fila.');return}
+ queue.push({id,title:'Vídeo do YouTube'});$('videoUrl').value='';renderQueue();say('Vídeo adicionado. Toque em ▶ na fila para reproduzir.');
+ if(current===-1)playIndex(queue.length-1);
+}
+function playIndex(i){
+ if(i<0||i>=queue.length)return;current=i;const v=queue[i];
+ $('nowTitle').textContent=v.title;$('nowSubtitle').textContent='YouTube · '+v.id;renderQueue();
+ if(!apiReady){say('Carregando player do YouTube…');setTimeout(()=>playIndex(i),500);return}
+ ensurePlayer(v.id);
+}
+$('searchForm').addEventListener('submit',e=>{e.preventDefault();const q=$('query').value.trim();if(q)window.open('https://www.youtube.com/results?search_query='+encodeURIComponent(q),'_blank','noopener,noreferrer')});
+$('addBtn').onclick=()=>addVideo($('videoUrl').value);
+$('videoUrl').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addVideo($('videoUrl').value)}});
+$('playBtn').onclick=()=>{if(!player){if(queue.length)playIndex(current<0?0:current);else say('Adicione um vídeo primeiro.');return}try{if(playing)player.pauseVideo();else player.playVideo()}catch(e){say('Use o botão de reprodução dentro do player.')}};
+$('nextBtn').onclick=()=>{if(queue.length)playIndex((current+1)%queue.length)};
+$('prevBtn').onclick=()=>{if(queue.length)playIndex((current-1+queue.length)%queue.length)};
+$('clearBtn').onclick=()=>{queue=[];current=-1;renderQueue();if(player){try{player.destroy()}catch(e){}player=null}$('playerWrap').innerHTML='<div class="placeholder"><div class="big">♫</div>Escolha um vídeo para começar</div>';$('nowTitle').textContent='Nenhuma música selecionada';$('nowSubtitle').textContent='Cole um link do YouTube abaixo';$('playBtn').textContent='▶'};
+loadYouTubeAPI();
+if('serviceWorker' in navigator && location.protocol.startsWith('https')) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body></html>
