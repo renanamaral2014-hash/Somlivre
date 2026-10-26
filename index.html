@@ -59,6 +59,14 @@
     }
     .brand-name { font-size: 20px; font-weight: 800; letter-spacing: -0.6px; }
     .brand-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+    .version-badge {
+      margin-left: auto;
+      font-size: 11px; font-weight: 650;
+      color: #8bcf9a; background: #132018;
+      border: 1px solid #2a4a35; border-radius: 999px;
+      padding: 4px 10px; letter-spacing: 0.2px;
+      flex-shrink: 0;
+    }
 
     /* Tabs */
     .tabs {
@@ -277,6 +285,7 @@
       <div class="brand-name">SomLivre</div>
       <div class="brand-sub">Sua biblioteca · Seu ritmo</div>
     </div>
+    <div class="version-badge" id="appVersion">v2.1.0</div>
   </header>
 
   <nav class="tabs" role="tablist">
@@ -363,7 +372,7 @@
     <section id="about" class="section">
       <div class="section-title">Sobre o SomLivre</div>
       <div class="note" style="margin-bottom:16px">
-        <strong>SomLivre v2</strong> — player pessoal de música feito para funcionar como PWA no iPhone.
+        <strong>SomLivre <span id="aboutVersion">v2.1.0</span></strong> — player pessoal de música feito para funcionar como PWA no iPhone.
         Biblioteca local com IndexedDB, controles de mídia do sistema (Media Session) e foco em
         reprodução contínua com a tela bloqueada usando arquivos de áudio reais.
       </div>
@@ -373,8 +382,12 @@
         • Controles de play/pausa/próxima devem aparecer na tela de bloqueio e no Centro de Controle.<br>
         • YouTube é secundário e não garante segundo plano no iOS.
       </p>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:8px">
+        <strong style="color:#8bcf9a">Versão atual:</strong> <span id="aboutVersionFull">v2.1.0</span>
+      </p>
       <p style="font-size:12px;color:#666">
-        Publicado via GitHub Pages · Sem servidor próprio · Seus arquivos ficam só no seu aparelho.
+        Publicado via GitHub Pages · Sem servidor próprio · Seus arquivos ficam só no seu aparelho.<br>
+        Se a versão acima não bater com a que você subiu, limpe o cache do Safari ou force o recarregamento.
       </p>
     </section>
   </main>

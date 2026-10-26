@@ -1,5 +1,5 @@
 /* SomLivre Service Worker — cache do app (não dos áudios) */
-const CACHE = 'somlivre-v2-static-1';
+const CACHE = 'somlivre-v2-static-2';
 const ASSETS = [
   './',
   './index.html',
